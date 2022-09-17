@@ -1,4 +1,4 @@
 {
     "app": "make && python3 app.py",
-    "context": {"environment": {"AWS_REGION": "us-west-1"}},
+    "context": {"environment": {"AWS_REGION": "us-west-1"}}
 }
