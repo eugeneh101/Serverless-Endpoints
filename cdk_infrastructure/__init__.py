@@ -1,4 +1,5 @@
 from aws_cdk import (
+    BundlingOptions,
     Duration,
     Stack,
     aws_apigateway as apigateway,
@@ -18,7 +19,22 @@ class ServerlessEndpointsStack(Stack):
             "EndpointsLambda",
             runtime=_lambda.Runtime.PYTHON_3_9,
             code=_lambda.Code.from_asset(
-                "source/endpoints", exclude=[".venv/*", "tests/*"]
+                "source/endpoints",
+                # exclude=[".venv/*", "tests/*"],  # seems to no longer do anything if use BundlingOptions
+                bundling=BundlingOptions(
+                    image=_lambda.Runtime.PYTHON_3_9.bundling_image,
+                    command=[
+                        "bash",
+                        "-c",
+                        " && ".join(
+                            [
+                                "pip install -r requirements.txt -t /asset-output",
+                                "cp handler.py /asset-output",  # need to cp instead of mv
+                                # "cp -au . /asset-output",  # or cp everything
+                            ]
+                        ),
+                    ],
+                ),
             ),
             handler="handler.lambda_handler",
             timeout=Duration.seconds(1),  # should be effectively instantaneous
