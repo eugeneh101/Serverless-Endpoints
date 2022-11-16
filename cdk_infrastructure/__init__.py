@@ -43,12 +43,13 @@ class ServerlessEndpointsStack(Stack):
 
         # dependency: API Gateway, lambda layer
         apigateway.LambdaRestApi(self, "ApiGateway", handler=self.endpoints_lambda)
-        powertools_layer = _lambda.LayerVersion.from_layer_version_arn(
-            self,
-            "aws_lambda_powertools",
-            layer_version_arn=(
-                f"arn:aws:lambda:{environment['AWS_REGION']}:"
-                "017000801446:layer:AWSLambdaPowertoolsPython:29"  # might consider getting latest layer
-            ),
-        )
-        self.endpoints_lambda.add_layers(powertools_layer)
+        # used requirements.txt to install aws-lambda-powertools
+        # powertools_layer = _lambda.LayerVersion.from_layer_version_arn(
+        #     self,
+        #     "aws_lambda_powertools",
+        #     layer_version_arn=(
+        #         f"arn:aws:lambda:{environment['AWS_REGION']}:"
+        #         "017000801446:layer:AWSLambdaPowertoolsPython:29"  # might consider getting latest layer
+        #     ),
+        # )
+        # self.endpoints_lambda.add_layers(powertools_layer)
