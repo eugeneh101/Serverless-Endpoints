@@ -1,58 +1,27 @@
+# Welcome to Serverless Endpoints Microservice
+The purpose of this microservice is to create backend endpoints without ever having to maintain a server (EC2). By connecting API Gateway to Lambda, we create an on-demand, scalable, and cheap (pay-as-you-go) backend.
 
-# Welcome to your CDK Python project!
 
-This is a blank project for CDK development with Python.
+# Architecture
+<p align="center"><img src="arch_diagram.png" width="800"></p>
+The architecture diagram looks more intense in the picture than in real life. What it actually entails is an API Gateway triggering a Lambda. The Lambda is a Docker image built with Python 3.9 and FastAPI (+ Mangum). The microservice is deployed with CDK, which translates to a Cloudformation template.
 
-The `cdk.json` file tells the CDK Toolkit how to execute your app.
+You may read the Lambda's Cloudwatch logs for observability: runtime duration, failures, and count of endpoint hits. If you are fancy, you can add metrics & alarms to the Lambda + API Gateway. For the business/operations/SRE team, you can New Relic to the Lambda such that there will be "single pane of glass" for 24/7 monitoring.
 
-This project is set up like a standard Python project.  The initialization
-process also creates a virtualenv within this project, stored under the `.venv`
-directory.  To create the virtualenv it assumes that there is a `python3`
-(or `python` for Windows) executable in your path with access to the `venv`
-package. If for any reason the automatic creation of the virtualenv fails,
-you can create the virtualenv manually.
 
-To manually create a virtualenv on MacOS and Linux:
+## Miscellaneous details:
+* In this branch `BundlingOptions`, I installed `aws-lambda-powertools` as part of `requirements.txt`. In the `NoBundlingOptions` branch, I decided to attached `aws-lambda-powertools` as a Lambda Layer instead because the core code would stay below 2 MB, which allows you to still be editable mode in the Lambda console.
+* Another benefit is that the `BundlingOptions` specifies the Docker image for Python 3.9 and then installs the Lambda's `requirements.txt` and thus ensures Python compatibility. The `NoBundlingOptions` branch installs `requirements.txt` using the Python version on your machine that you use to `cdk deploy`, which might not be exactly Python 3.9 and thus might install dependencies that are not compatible with the Lambda's runtime Python version.
+* `cdk.json` is basically the config file. I specified to deploy this microservice to us-west-1 (California). You can change this to your region of choice.
+* The following is the AWS resources deployed by CDK and thus Cloudformation:
+<p align="center"><img src="AWS_resources.png" width="800"></p>
 
+
+
+# Deploying the Microservice Yourself
 ```
-$ python3 -m venv .venv
-```
-
-After the init process completes and the virtualenv is created, you can use the following
-step to activate your virtualenv.
-
-```
+$ python -m venv .venv
 $ source .venv/bin/activate
+$ python -m pip install -r requirements.txt
+$ cdk deploy #  Docker daemon must be running, also assumes AWS CLI is configured + npm installed with `aws-cdk`; detailed instructions at https://cdkworkshop.com/15-prerequisites.html
 ```
-
-If you are a Windows platform, you would activate the virtualenv like this:
-
-```
-% .venv\Scripts\activate.bat
-```
-
-Once the virtualenv is activated, you can install the required dependencies.
-
-```
-$ pip install -r requirements.txt
-```
-
-At this point you can now synthesize the CloudFormation template for this code.
-
-```
-$ cdk synth
-```
-
-To add additional dependencies, for example other CDK libraries, just add
-them to your `setup.py` file and rerun the `pip install -r requirements.txt`
-command.
-
-## Useful commands
-
- * `cdk ls`          list all stacks in the app
- * `cdk synth`       emits the synthesized CloudFormation template
- * `cdk deploy`      deploy this stack to your default AWS account/region
- * `cdk diff`        compare deployed stack with current state
- * `cdk docs`        open CDK documentation
-
-Enjoy!
