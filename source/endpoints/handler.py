@@ -1,11 +1,5 @@
-import sys
-
-sys.path.insert(
-    0, "./__lambda_dependencies__"
-)  # folder created by Makefile during `cdk deploy`; eventually figure out docker
 from enum import Enum
 from typing import Optional
-
 
 from aws_lambda_powertools.logging import Logger
 from fastapi import FastAPI
